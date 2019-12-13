@@ -6,8 +6,8 @@ services:
     ports:
       - "8086:8086"
     volumes:
-      - /tig/data/influxdb:/var/lib/influxdb
-      - /tig/conf/influxdb:/etc/influxdb/
+      - ./data/influxdb:/var/lib/influxdb
+      - ./conf/influxdb:/etc/influxdb/
     restart: always
 
   telegraf:
@@ -15,33 +15,52 @@ services:
     image: telegraf
     network_mode: "host"
     volumes:
-      - /tig/conf/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
+      - ./conf/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
-    
+
+
+
   grafana:
+    image: grafana/grafana:6.0.0
+    network_mode: 'host'
     container_name: grafana
-    image: grafana/grafana
-    user: "0"
+    restart: unless-stopped
     ports:
-      - "3000:3000"
+      - '3000:3000'
+    user: '0'
     volumes:
-      - /tig/data/grafana:/var/lib/grafana
-      - /tig/log/grafana:/var/log/grafana
-      - /tig/conf/grafana/grafana.ini:/etc/grafana/grafana.ini
-    links:
-      - influxdb
-    restart: always
+      - ./data/grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+
+  mysql:
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: grafana
+      MYSQL_PASSWORD: grafana
+      MYSQL_ROOT_PASSWORD: grafana
+      MYSQL_USER: grafana
+    image: mariadb
+    ports:
+      - "3306:3306/tcp"
+    restart: unless-stopped
+    volumes:
+      - /var/lib/docker/mysql:/var/lib/mysql
+
 
   mqtt:
     container_name: mqtt
+    network_mode: "host"
     image: eclipse-mosquitto:latest
-    user: "0"
+#    user: "demo"
     ports:
-      - "1883:1883"
+      - "1883:1883/tcp"
       - "9001:9001"
     volumes:
-      - /tig/conf/mqtt/:/mosquitto/config/
-      - /tig/data/mqtt/:/mosquitto/data/
-      - /tig/log/mqtt/:/mosquitto/log/
+      - ./conf/mqtt/mosquitto/:/mosquitto/config/
+      - ./conf/mqtt/mosquitto/passswd:/etc/mosquitto/pwfile
+      - ./data/mqtt/:/mosquitto/data/
+      - ./log/mqtt/:/mosquitto/log/
     restart: always
