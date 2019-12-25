@@ -19,8 +19,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
 
-
-
   grafana:
     image: grafana/grafana:6.0.0
     network_mode: 'host'
@@ -48,7 +46,6 @@ services:
     restart: unless-stopped
     volumes:
       - /var/lib/docker/mysql:/var/lib/mysql
-
 
   mqtt:
     container_name: mqtt
