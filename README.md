@@ -6,7 +6,9 @@ I used /aiot folder for this setup. If you are going to use an other folder; ple
  sudo docker exec -it a65f5c049ca0 /bin/bash
 # 重置 grafana 密码
  ```
+ 停止docker 容器
  docker-compose down
+ 
  [root@local]# sqlite3 ./data/grafana/grafana.db
  #查看数据库中包含的表
 .tables
@@ -19,6 +21,8 @@ update user set password = '59acf18b94d7eb0694c61e60ce44c110c7a683ac6a8f09580d62
  
 #退出sqlite3
 .exit
+
+重新启动 docker-compose up -d
  ```
  
  
